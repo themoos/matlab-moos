@@ -79,10 +79,10 @@ extern "C" {
 
 /** A sensor port */
 #ifdef _WIN32
-#include <MOOSGenLib/MOOSNTSerialPort.h>
+#include <Utils/TSerialPort.h>
 CMOOSNTSerialPort gPort;
 #else
-#include <MOOSGenLib/MOOSLinuxSerialPort.h>
+#include <UtilsUtils/erialPort.h>
 CMOOSLinuxSerialPort gPort;
 #endif
 
