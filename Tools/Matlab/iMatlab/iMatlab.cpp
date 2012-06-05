@@ -40,7 +40,6 @@
 //
 // copyright Paul Newman, University of Oxford 2005
 
-
 #ifdef _WIN32
 #pragma warning(disable : 4786)
 #endif
@@ -52,7 +51,7 @@
 #include <string>
 #include <map>
 #include <fstream>
-#include <MOOSLIB/MOOSLib.h>
+#include "MOOS/libMOOS/MOOSLib.h"
 
 extern "C" {
 #include "mex.h"
@@ -79,10 +78,10 @@ extern "C" {
 
 /** A sensor port */
 #ifdef _WIN32
-#include <Utils/TSerialPort.h>
+#include "MOOS/libMOOS/Utils/MOOSNTSerialPort.h"
 CMOOSNTSerialPort gPort;
 #else
-#include <UtilsUtils/erialPort.h>
+#include "MOOS/libMOOS/Utils/MOOSLinuxSerialPort.h"
 CMOOSLinuxSerialPort gPort;
 #endif
 
@@ -637,13 +636,13 @@ void iMatlab( int nlhs, mxArray *plhs[], int nrhs, const mxArray  *prhs[] )
                             mxSetFieldByNumber(plhs[0],i,nTypeField,mxCreateString(pType));
                             
                             //copy in time
-                            mxSetFieldByNumber(plhs[0],i,nTimeField,mxCreateScalarDouble(p->GetTime()));    
+                            mxSetFieldByNumber(plhs[0],i,nTimeField,mxCreateDoubleScalar(p->GetTime()));
                             
                             //copy in sVal
                             mxSetFieldByNumber(plhs[0],i,nStrField,mxCreateString(p->m_sVal.c_str()));
                             
                             //copy in dfVal
-                            mxSetFieldByNumber(plhs[0],i,nDblField,mxCreateScalarDouble(p->GetDouble()));    
+                            mxSetFieldByNumber(plhs[0],i,nDblField,mxCreateDoubleScalar(p->GetDouble()));
                             
                             //copy in src process
                             mxSetFieldByNumber(plhs[0],i,nSrcField,mxCreateString(p->m_sSrc.c_str()));
