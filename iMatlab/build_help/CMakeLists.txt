@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+find_package(MOOS 10.0)
+FOREACH (dir ${MOOS_INCLUDE_DIRS})
+    MESSAGE(${dir})
+ENDFOREACH(dir)
