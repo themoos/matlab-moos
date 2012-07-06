@@ -248,7 +248,7 @@ bool OnMOOSConnect(void * pParam)
 
 
 //called the fist time iMatlab runs or when 'init' is passed as teh first parameter
-bool Initialise(const mxArray *prhs[], int nrhs)
+bool Initialise(int nlhs, mxArray *plhs[], const mxArray *prhs[], int nrhs)
 {
     
     if(bInitialised)
@@ -388,7 +388,49 @@ bool Initialise(const mxArray *prhs[], int nrhs)
             }
         }
     }
-    
+
+    // tes 2012-06-20 - write iMatlab configuration to return value [config] = iMatlab('init', ... );
+    if(nlhs == 1)
+    {
+        // transform STRING_LIST into map of key onto values
+        std::map<std::string, std::vector<std::string> > params;
+        for (STRING_LIST::const_iterator q = ConfigFileParams.begin();q != ConfigFileParams.end(); ++q)
+        {
+        	std::string sTok,sVal;
+        	if(gConfigReader.GetTokenValPair(*q, sTok, sVal))
+        	{
+        		params[sTok].push_back(sVal);
+        	}
+        }        
+
+        const int NUMBER_OF_STRUCTS = 1;
+        const int NUMBER_OF_FIELDS = params.size();
+        mwSize dims[2] = {1, NUMBER_OF_STRUCTS };
+
+        std::vector<const char *> field_names;
+        for(std::map<std::string, std::vector<std::string> >::const_iterator it =
+                params.begin(), end = params.end(); it != end; ++it)
+        {
+            field_names.push_back(it->first.c_str());
+        }        
+        plhs[0] = mxCreateStructArray(2, dims, NUMBER_OF_FIELDS, &field_names[0]);
+        
+        for(std::map<std::string, std::vector<std::string> >::const_iterator it =
+                params.begin(), end = params.end(); it != end; ++it)
+        {
+            int field = mxGetFieldNumber(plhs[0],it->first.c_str());
+            
+            std::vector<const char *> values;
+            for(std::vector<std::string>::const_iterator jt = it->second.begin(),
+                    endj = it->second.end(); jt != endj; ++jt)
+            {
+                values.push_back(jt->c_str());
+            }
+            mxSetFieldByNumber(plhs[0],0,field,mxCreateCharMatrixFromStrings(values.size(), &values[0]));
+        }        
+        
+    }
+
     
     std::string sBool;
     
@@ -541,7 +583,7 @@ void iMatlab( int nlhs, mxArray *plhs[], int nrhs, const mxArray  *prhs[] )
     
     if(MOOSStrCmp(sCmd,"INIT"))
     {
-        Initialise(prhs,nrhs);
+        Initialise(nlhs, plhs, prhs,nrhs);
     }
     else
     {

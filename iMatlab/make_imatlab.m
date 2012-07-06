@@ -1,52 +1,70 @@
 %this is a simple build script for iMatlab
 %
+function make_imatlab
 
-MOOS_SRC_ROOT = '/Users/pnewman/code/CompactMOOSProjects/CoreMOOS/Core/libMOOS';
-MOOS_LIB_DIR = '/Users/pnewman/code/CompactMOOSProjects/CMB/bin';
+%ask the user if they want to discover the installation of MOOS or specitfy
+%it manually
+autodiscover = yesno('Do you want to autodiscover an appropriate MOOS installation?');
 
-include_dirs = [];
-if(ismac || isunix)
-    [status,stdio] = system('cmake ./build_help');
-    if(status~=0)
-        disp(stdio);
-        error('CMake invocation failed')
-    end;
-    stdio = regexp(stdio, '[\f\n\r]', 'split');
-    for i = 1:length(stdio)
-        if(length(stdio{i})~=0)            
-            %is this an include path
-            t = textscan(stdio{i}, 'INCLUDE:%s'); 
-            theline = char(t{1});
-            if(~isempty(theline))
-                tok = 'libMOOS/include';
-                j = strfind(theline,tok);
-                if(~isempty(j))                   
-                    [include_root, last_part, ext] = fileparts(theline);
-                end
-            end;
+if(~autodiscover)
 
-            %is is library path
-            t = textscan(stdio{i}, 'LIB:%s');                        
-            theline = char(t{1});
-            if(~isempty(theline))
-                [library_path, library_name, ext] = fileparts(theline) ;
+    fprintf(['\n\n\nSTEPS\n********\n'...
+    '\n\n1) You need to specify in the make_imatlab.m file the root of the libMOOS source tree.\n' ...
+    '   This path should end in Core/libMOOS and contain App, Comms and Utils directories. \n' ...
+    '2) You need ot specify in the same file the location (directory) of the built MOOS\n'...
+    '   library libMOOS.\n'...
+    '\nThe lines you need to edit are near the information printed below\n']);
+
+    edit_location=dbstack('-completenames')
+    
+    %these are some defaults that will never work - YOU NEED TO EDIT THESE 
+    include_root = '~/CoreMOOS/Core/libMOOS';
+    library_path = '~/CMB/bin';    
+    
+else
+    if(ismac || isunix)
+        [status,stdio] = system('cmake ./build_help');
+        if(status~=0)
+            disp(stdio);
+            error('CMake invocation failed')
+        end;
+        stdio = regexp(stdio, '[\f\n\r]', 'split');
+        for i = 1:length(stdio)
+            if(length(stdio{i})~=0)            
+                %is this an include path
+                t = textscan(stdio{i}, 'INCLUDE:%s'); 
+                theline = char(t{1});
+                if(~isempty(theline))
+                    tok = 'libMOOS/include';
+                    j = strfind(theline,tok);
+                    if(~isempty(j))                   
+                        [include_root, last_part, ext] = fileparts(theline);
+                    end
+                end;
+
+                %is is library path
+                t = textscan(stdio{i}, 'LIB:%s');                        
+                theline = char(t{1});
+                if(~isempty(theline))
+                    [library_path, library_name, ext] = fileparts(theline) ;
+                end;
             end;
         end;
+
+
     end;
-    
-    
-end;
 
-fprintf('   found includes at %s\n',include_root)
-fprintf('   found library  at %s\n',library_path)
-fprintf('   library name is   %s(%s)\n',library_name,ext)
+    fprintf('   found includes at %s\n',include_root)
+    fprintf('   found library  at %s\n',library_path)
+    fprintf('   library name is   %s(%s)\n',library_name,ext)
 
-reply = input('\ndo these look right? [Y/n]\n', 's');
-if(isempty(reply))
-    reply = 'y';
-end
-if(lower(reply)~='y')
-    return 
+    reply = input('\ndo these look right? [Y/n]\n', 's');
+    if(isempty(reply))
+        reply = 'y';
+    end
+    if(lower(reply)~='y')
+        return 
+    end
 end
 
 
@@ -63,15 +81,28 @@ end;
 
 cmd = ['mex ', include_directive,  ' -L', library_path, ' -lMOOS',' iMatlab.cpp mexHelpers.cpp'];
 
-fprintf('\nAbout to invoke mex compiler does this directive\n  %s \n\n',cmd);
-reply = input('Does this look right? [Y/n]\n\n', 's');
+fprintf('\nAbout to invoke mex compiler with:\n %s \n\n',cmd);
+
+if(~yesno('Does this look right?'))
+    return;
+end
+    
+
+fprintf('compiling.....')
+eval(cmd)
+
+
+
+
+function ok = yesno(prompt)
+reply = input(['\n' prompt '[Y/n]\n'],'s');
 if(isempty(reply))
     reply = 'y';
 end
 if(lower(reply)~='y')
-    return 
+    ok = 0;
+else
+    ok = 1;
 end
 
 
-fprintf('compiling.....')
-eval(cmd)

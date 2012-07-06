@@ -21,4 +21,5 @@ ProcessConfig = iMatlab
 	SerialComms = false
 	SERIAL_TIMEOUT = 10.0
 	SUBSCRIBE = DB_TIME @ 0.0
+    SomeConfigValueA = 323.45
 }

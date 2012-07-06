@@ -10,7 +10,7 @@ Typical Usage:
 
     1)  iMatlab                               This help message
 
-    2)  iMatlab('init',Param1,Val1,....)       Initialisation
+    2)  [config] = iMatlab('init',Param1,Val1,....) Initialisation
 
     3)  RetVal = iMatlab(CMD,Param1,Param2)   Do something useful
 
@@ -52,6 +52,7 @@ Here is a typical configuration file
         SerialComms = false
         SERIAL_TIMEOUT = 10.0
         SUBSCRIBE = DB_TIME @ 0.0
+        SomeConfigValueA = 45.56
     }
 
 Most of the fields are understandable by reading the MOOS documentation. The
@@ -74,7 +75,13 @@ Initialisation
 
 Always call iMatlab('init') first. By default iMatlab looks to read configuration
 data from iMatlab.moos. Alterntively you can use 
-iMatlab('init','CONFIG_FILE','XYZ.moos') to read from the file XYZ.moos
+iMatlab('init','CONFIG_FILE','XYZ.moos') to read from the file XYZ.moos. 
+
+When initialising (called with 'init') iMatlab can return a structure of
+property/value pairs which represent all the setting in the configuration block
+
+config = iMatlab('init','CONFIG_FILE','XYZ.moos') 
+
 
 MOOS COMMS
 *************
