@@ -1,6 +1,10 @@
-%this is a simple build script for iMatlab
-%
+
 function make_imatlab
+%this is a simple build script for iMatlab. Simply run make_imatlab from 
+%the matlab command line and follow instructions. Basically you get given
+%the choice to autodiscover the location of the MOOS source tree and
+%the build you want to link against or specify them yourself.
+
 
 %ask the user if they want to discover the installation of MOOS or specitfy
 %it manually
@@ -17,9 +21,9 @@ if(~autodiscover)
 
     edit_location=dbstack('-completenames')
     
-    %these are some defaults that will never work - YOU NEED TO EDIT THESE 
-    include_root = '~/CoreMOOS/Core/libMOOS';
-    library_path = '~/CMB/bin';    
+    %these are some defaults that will never work - YOU NEED TO EDIT THESE
+    include_root = '/Users/pnewman/code/CompactMOOSProjects/CoreMOOS/Core/libMOOS';
+    library_path = '/Users/pnewman/code/CompactMOOSProjects/CMB/lib';    
     
 else
     if(ismac || isunix)
@@ -88,8 +92,10 @@ if(~yesno('Does this look right?'))
 end
     
 
-fprintf('compiling.....')
+fprintf('compiling.....\n')
 eval(cmd)
+fprintf('.....done\n')
+
 
 
 
